@@ -214,7 +214,7 @@ public class RestClient {
     }
     
     /**
-     * Incluye tiempo en segundos
+     * Incluye timeout tiempo en segundos
      * ver: https://howtodoinjava.com/spring-boot2/resttemplate/resttemplate-timeout-example/
      * @param url
      * @param data
