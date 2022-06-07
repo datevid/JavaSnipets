@@ -212,5 +212,50 @@ public class RestClient {
 
         }
     }
+    
+    /**
+     * Incluye tiempo en segundos
+     * ver: https://howtodoinjava.com/spring-boot2/resttemplate/resttemplate-timeout-example/
+     * @param url
+     * @param data
+     * @param classOfResponse
+     * @param <T>
+     * @return
+     * @throws Exception
+     */
+    public static  <T> T post(String url, Object data, Class<T> classOfResponse, int timeout) throws Exception {
+        String dataJson = "";
+        try {
+            Gson gson = new Gson();
+            dataJson = gson.toJson(data);
+            logger.debug("url");
+            logger.debug(url);
+            logger.debug("dataJson");
+            logger.debug(dataJson);
+            SimpleClientHttpRequestFactory s = new SimpleClientHttpRequestFactory();
+            s.setReadTimeout(timeout*1000);
+            s.setConnectTimeout(timeout*1000);
+            RestTemplate restTemplate = new RestTemplate(s);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            HttpEntity<String> request = new HttpEntity<>(dataJson, headers);
+            T t = restTemplate.postForObject(url, request, classOfResponse);
+            dataJson = gson.toJson(t);
+            logger.debug("response");
+            logger.debug(dataJson);
+            return t;
+        }
+        catch (HttpServerErrorException | HttpClientErrorException httpExc) {
+            HttpStatus status = httpExc.getStatusCode();
+            //if (status.equals(412)) {
+            //    throw new Exception("No se puede registrar en el Repositorio como nuevo, porque ya existe");
+            //}
+            throw httpExc;
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new Exception("Ocurrió un error durante la petición REST " + url + " con data " + dataJson, e);
+        }
+    }
 
 }
